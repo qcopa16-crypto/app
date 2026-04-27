@@ -55,6 +55,7 @@ Plaintext
 1. 环境准备
 确保你的电脑上已安装 Python 3.8 或以上版本，以及 MySQL 数据库。
 
+Bash
 # 1. 克隆项目到本地
 git clone https://github.com/qcopa16-crypto/app.git
 cd app
@@ -65,23 +66,22 @@ source venv/bin/activate  # Windows 下使用: venv\Scripts\activate
 
 # 3. 安装依赖包
 pip install fastapi uvicorn sqlalchemy pymysql pydantic-settings passlib[bcrypt] python-jose[cryptography] python-multipart
-
 2. 数据库配置
 在 MySQL 中创建一个数据库（例如 campus_task_db）。
 请确保你已经补全了 core/config.py 和 db/session.py 文件，并在 .env 文件中配置好你的数据库连接字符串和 JWT 密钥：
 
+代码段
 # 示例 .env 环境变量
 SECRET_KEY="your-super-secret-key"
 MYSQL_SERVER="127.0.0.1"
 MYSQL_USER="root"
 MYSQL_PASSWORD="yourpassword"
 MYSQL_DB="campus_task_db"
-
 3. 运行服务
 在项目根目录（main.py 所在目录）下执行启动命令：
 
+Bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
 服务成功启动后，控制台会显示 Application startup complete.
 
 📖 接口文档 (API Documentation)
@@ -92,3 +92,12 @@ Swagger UI (推荐): 访问 http://127.0.0.1:8000/docs
 你可以在这里直接点击 "Try it out" 测试注册、登录（获取 Token）、添加任务等全套流程。
 
 ReDoc: 访问 http://127.0.0.1:8000/redoc
+
+📱 客户端对接说明 (For Android/Frontend)
+统一鉴权头: 登录成功获取 access_token 后，后续请求其他接口均需在 HTTP 请求 Header 中携带该 Token：
+
+HTTP
+Authorization: Bearer <your_access_token>
+静态资源访问: 通过 /me/avatar 接口上传头像后，返回的路径为 /static/avatars/xxx.jpg。客户端展示时需拼接完整的服务器地址，如 http://10.0.2.2:8000/static/avatars/xxx.jpg。
+
+本地联调 IP: 若使用 Android 官方模拟器，请求本机的接口请使用 http://10.0.2.2:8000 而非 127.0.0.1。
