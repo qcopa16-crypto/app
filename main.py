@@ -6,6 +6,9 @@ from fastapi.staticfiles import StaticFiles  # 导入静态文件模块
 
 from api import auth, tasks, users  # 导入 users 模块
 from core.config import settings
+from db.session import engine, Base
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
