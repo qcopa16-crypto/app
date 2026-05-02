@@ -1,103 +1,82 @@
-🎓 校园任务管理系统 (Campus Task Management API)
-基于 Python 3 + FastAPI 构建的校园任务管理系统后端 RESTful API 服务。
-本项目采用标准的前后端分离架构，提供高性能、异步的接口服务，支持完整的用户鉴权、任务流转及数据持久化，专为 Android / 移动端等前端应用设计。
+# 🎓 校园任务管理系统 (Campus Task Management System)
 
-✨ 核心特性 (Features)
-⚡️ 高性能异步框架: 基于 FastAPI 构建，自动生成 OpenAPI (Swagger) 交互式文档。
+本项目是一套完整的**前后端分离**校园任务管理解决方案。后端基于 **Python FastAPI** 构建高性能异步 API，移动端采用 **Android 原生 (Java)** 开发。系统旨在帮助学生高效管理日常学习任务，支持实时同步与个性化资料维护。
 
-🔒 安全鉴权体系: 使用 JWT (JSON Web Tokens) 进行无状态鉴权，密码采用 bcrypt 加盐哈希加密，确保校园数据安全。
+---
 
-📂 规范的工程目录: 严格遵循 API 路由 -> Schemas 校验 -> CRUD 操作 -> Models 映射 的分层架构，高内聚低耦合。
+## ✨ 核心特性
 
-🗄️ ORM 数据管理: 深度集成 SQLAlchemy，告别原生 SQL 拼接，防止 SQL 注入。
+### 1. 鉴权与安全
+* **JWT 无状态鉴权**：基于 JSON Web Token 的认证机制，确保接口访问安全。
+* **密码加盐加密**：后端采用 `bcrypt` 算法对用户密码进行哈希存储。
+* **自动登录逻辑**：客户端实现 Token 持久化，启动时自动校验登录状态。
 
-👤 隔离的数据视图: 严格的越权校验机制，确保每位学生只能访问和修改自己的任务列表。
+### 2. 任务管理 (CRUD)
+* **全生命周期控制**：支持任务的新建、查询、编辑修改以及滑动删除。
+* **状态实时切换**：支持点击 CheckBox 快速标记任务完成情况，并同步至服务器。
+* **交互优化**：集成 `SwipeRefreshLayout` 实现下拉刷新，以及 `ItemTouchHelper` 实现侧滑删除。
 
-🖼️ 静态资源管理: 内置文件上传功能，支持用户头像与附件的本地持久化与静态路由映射。
+### 3. 个人中心与资源
+* **资料修改**：支持用户自定义修改昵称与个人签名。
+* **头像上传系统**：支持调用系统相册选取图片，通过 `Multipart` 接口上传，并使用 `Glide` 实现网络头像异步加载。
+* **静态资源服务**：后端自动映射物理路径，支持通过 URL 访问用户头像等资源。
 
-🛠️ 技术栈 (Tech Stack)
-核心框架: Python 3.8+ / FastAPI / Uvicorn
+---
 
-数据库交互: SQLAlchemy (ORM) / PyMySQL
+## 🛠️ 技术栈
 
-数据验证: Pydantic V2
+| 模块 | 技术选型 |
+| :--- | :--- |
+| **后端框架** | Python 3.8+ / FastAPI / Uvicorn |
+| **数据库** | MySQL / SQLAlchemy (ORM) / PyMySQL |
+| **数据模型** | Pydantic V2 |
+| **Android 网络** | Retrofit 2 / OkHttp 3 / Gson |
+| **图片处理** | Glide 4 (加载) / MultipartBody (上传) |
+| **UI 交互** | Material Design / RecyclerView / SwipeRefreshLayout |
 
-安全加解密: passlib[bcrypt] / python-jose[cryptography]
+---
 
-文件处理: python-multipart
+## 📂 项目目录说明
 
-📁 目录结构 (Project Structure)
+### 后端目录 (`backend/`)
+```plaintext
+├── api/                # API 路由 (Auth, Tasks, Users)
+├── core/               # 核心配置 (JWT 签发、安全工具)
+├── crud/               # 数据库 CRUD 封装逻辑
+├── db/                 # 数据库连接与会话管理
+├── models/             # SQLAlchemy 数据模型 (表结构)
+├── schemas/            # Pydantic 校验模型 (输入输出格式)
+└── main.py             # 项目启动入口与静态文件挂载
+Android 目录 (android/)
 Plaintext
-├── api/                    # 📌 API 路由层 (Controllers)
-│   ├── auth.py             # 注册、登录与 Token 分发接口
-│   ├── dependencies.py     # 核心依赖注入 (解析Token、获取DB Session)
-│   ├── tasks.py            # 任务增删改查业务接口
-│   └── users.py            # 用户资料与头像上传接口
-├── core/                   # ⚙️ 核心配置层
-│   ├── config.py           # 环境变量与全局配置中心 (需自行配置)
-│   └── security.py         # 密码哈希与 JWT 签发工具
-├── crud/                   # 🛠️ 数据库操作层 (Create, Read, Update, Delete)
-│   ├── crud_task.py        # 任务表相关 SQL 逻辑
-│   └── crud_user.py        # 用户表相关 SQL 逻辑
-├── db/                     # 🔌 数据库连接层
-│   └── session.py          # SQLAlchemy 引擎与 Session 实例
-├── models/                 # 🗄️ ORM 映射模型
-│   ├── task.py             # Task 数据表结构
-│   └── user.py             # User 数据表结构
-├── schemas/                # 🛡️ 数据校验与序列化模型 (Pydantic)
-│   ├── task_schema.py      # Task 请求/响应体定义
-│   └── user_schema.py      # User 请求/响应体定义
-├── main.py                 # 🚀 FastAPI 启动主入口
-└── test_main.http          # 📝 HTTP 接口简易测试脚本
-(注：为保障安全，数据库连接信息、core/ 及 db/ 下的部分敏感配置文件未提交至代码库。)
-
-🚀 快速启动 (Getting Started)
-1. 环境准备
-确保你的电脑上已安装 Python 3.8 或以上版本，以及 MySQL 数据库。
+├── api/                # 网络层：Retrofit 接口定义与拦截器
+├── model/              # 数据实体类 (POJO)
+├── ui/                 # Activity 与 Adapter 业务逻辑
+└── utils/              # 工具类：SharedPreferences 管理
+🚀 快速启动
+1. 后端部署
+安装环境：确保 Python 3.8+ 环境并安装依赖：
 
 Bash
-# 1. 克隆项目到本地
-git clone https://github.com/qcopa16-crypto/app.git
-cd app
-
-# 2. 创建并激活虚拟环境 (推荐)
-python -m venv venv
-source venv/bin/activate  # Windows 下使用: venv\Scripts\activate
-
-# 3. 安装依赖包
 pip install fastapi uvicorn sqlalchemy pymysql pydantic-settings passlib[bcrypt] python-jose[cryptography] python-multipart
-2. 数据库配置
-在 MySQL 中创建一个数据库（例如 campus_task_db）。
-请确保你已经补全了 core/config.py 和 db/session.py 文件，并在 .env 文件中配置好你的数据库连接字符串和 JWT 密钥：
+配置数据库：在 core/config.py 中设置 MySQL 连接字符串。
 
-代码段
-# 示例 .env 环境变量
-SECRET_KEY="your-super-secret-key"
-MYSQL_SERVER="127.0.0.1"
-MYSQL_USER="root"
-MYSQL_PASSWORD="yourpassword"
-MYSQL_DB="campus_task_db"
-3. 运行服务
-在项目根目录（main.py 所在目录）下执行启动命令：
+运行服务：
 
 Bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-服务成功启动后，控制台会显示 Application startup complete.
+2. Android 客户端调试
+修改 IP 地址：在 RetrofitClient.java 中将 BASE_URL 修改为服务器地址。
 
-📖 接口文档 (API Documentation)
-得益于 FastAPI 的特性，项目启动后会自动生成实时可交互的接口文档。
+注：Android 模拟器访问本机请使用 http://10.0.2.2:8000/。
 
-Swagger UI (推荐): 访问 http://127.0.0.1:8000/docs
+权限配置：确保 AndroidManifest.xml 中已开启 INTERNET 权限。
 
-你可以在这里直接点击 "Try it out" 测试注册、登录（获取 Token）、添加任务等全套流程。
+运行项目：使用 Android Studio 同步 Gradle 并运行。
 
-ReDoc: 访问 http://127.0.0.1:8000/redoc
+📖 接口文档
+项目启动后访问：
 
-📱 客户端对接说明 (For Android/Frontend)
-统一鉴权头: 登录成功获取 access_token 后，后续请求其他接口均需在 HTTP 请求 Header 中携带该 Token：
+Swagger UI (交互式): http://127.0.0.1:8000/docs
 
-HTTP
-Authorization: Bearer <your_access_token>
-静态资源访问: 通过 /me/avatar 接口上传头像后，返回的路径为 /static/avatars/xxx.jpg。客户端展示时需拼接完整的服务器地址，如 http://10.0.2.2:8000/static/avatars/xxx.jpg。
-
-本地联调 IP: 若使用 Android 官方模拟器，请求本机的接口请使用 http://10.0.2.2:8000 而非 127.0.0.1。
+ReDoc: http://127.0.0.1:8000/redoc
